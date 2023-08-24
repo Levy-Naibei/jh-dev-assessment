@@ -66,7 +66,7 @@ def load_data():
          date_submitted = None
       
       submission_id = None
-      if row['_id'] != "None":
+      if isinstance(row['_id'], int):
          submission_id = int(row['_id'])
       else:
          submission_id = None
