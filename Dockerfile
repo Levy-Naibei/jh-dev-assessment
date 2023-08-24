@@ -1,23 +1,14 @@
-# Use an official Python runtime as a parent image
-FROM python:3.8-slim
+# syntax=docker/dockerfile:1
 
-# Set the working directory in the container
-WORKDIR /app
+FROM python:3.8-slim-buster
 
-# Copy the requirements file into the container
+WORKDIR /python-docker
+
 COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 4000
 
-# Copy the rest of the application code into the container
 COPY . .
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
-
-# Define environment variables
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
-
-# Run app.py when the container launches
-CMD ["python", "app.py"]
+CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

@@ -20,6 +20,7 @@ given dataset to fit into the given PostgreSQL table structure.
 
 - clone the repo: `git clone https://github.com/Levy-Naibei/jh-dev-assessment.git`
 - `cd jh-dev-assessment`
+- activate virtual environment: `source venv\bin\activate`
 - run `pip install -r requirements.txt`
 - add environment variable as shown in `.env.sample.txt`
 - run `python app.py`
@@ -29,9 +30,9 @@ given dataset to fit into the given PostgreSQL table structure.
 
 - clone the repo: `git clone https://github.com/Levy-Naibei/jh-dev-assessment.git`
 - `cd jh-dev-assessment`
-- build the docker image: `docker build -t mentor-checklist . `
-- run `docker run -dp 8080:80 mentor-checklist`
-- Access the api: `http://localhost:8080`
+- build the docker image: `docker build -t mentor-checklist-api . `
+- run `docker run -d -p 4000:5000 mentor-checklist-api`
+- Access the api: `http://localhost:4000`
 
 ## Allow docker container to connect to a local host postgres database
 
