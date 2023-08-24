@@ -6,8 +6,8 @@ given dataset to fit into the given PostgreSQL table structure.
 
 ## Prerequisite
 
-- (Docker)[https://docs.docker.com/get-docker/]
-- (PostgreSQL)[https://www.postgresql.org/download/]
+- [Docker](https://docs.docker.com/get-docker/)
+- [PostgreSQL](https://www.postgresql.org/download/)
 
 ## Tools used
 
@@ -29,15 +29,14 @@ given dataset to fit into the given PostgreSQL table structure.
 
 - clone the repo: `git clone https://github.com/Levy-Naibei/jh-dev-assessment.git`
 - `cd jh-dev-assessment`
-- use `host ip` not `localhost` to connect to the PostgreSQL database on your host
 - build the docker image: `docker build -t mentor-checklist . `
-- run `docker run -dp 8080:80 --network=host mentor-checklist`
+- run `docker run -dp 8080:80 mentor-checklist`
 - Access the api: `http://localhost:8080`
 
 ## Allow docker container to connect to a local host postgres database
 
+- use `host ip` not `localhost` to connect to the PostgreSQL database on your host
 - cd in configs files:
-    - configure `pg_hba.conf` file by adding entry `host    all    all   your-docker-container_ip/32`
     - Update `postgresql.conf` by changing from `listen_addresses ='localhost'` to `listen_addresses= '*'`
 - Restart PostgresQL:
     - `sudo service postgresql restart` on Linux
