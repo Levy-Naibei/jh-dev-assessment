@@ -26,16 +26,16 @@ class MentorChecklist(db.Model):
   county = db.Column(db.Text)
   date_submitted = db.Column(db.TIMESTAMP)
   drill_topic = db.Column(db.Text)
-  # cme_unique_id = db.Column(db.BigInteger)
-  # drill_unique_id = db.Column(db.Text)
-  # essential_cme_topic = db.Column(db.Boolean)
-  # essential_drill_topic = db.Column(db.Boolean)
-  # facility_code = db.Column(db.Text)
-  # facility_name = db.Column(db.Text)
-  # id_number_cme = db.Column(db.Text)
-  # id_number_drill = db.Column(db.Text)
+  cme_unique_id = db.Column(db.BigInteger)
+  drill_unique_id = db.Column(db.Text)
+  essential_cme_topic = db.Column(db.Boolean)
+  essential_drill_topic = db.Column(db.Boolean)
+  facility_code = db.Column(db.Text)
+  facility_name = db.Column(db.Text)
+  id_number_cme = db.Column(db.Text)
+  id_number_drill = db.Column(db.Text)
   mentor_name = db.Column(db.Text)
-  # submission_id = db.Column(db.BigInteger)
+  submission_id = db.Column(db.BigInteger)
   success_story = db.Column(db.Text)
 
 @app.route("/")
@@ -48,15 +48,6 @@ def load_data():
   sheet_id = os.environ["SHEET_ID"]
   df = pd.read_csv(f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv")
   df.fillna("None", inplace=True)
-  
-  # df['essential_cme_topic'] = df['essential_cme_topic'].fillna(False)
-  # df['essential_drill_topic'] = df['essential_drill_topic'].fillna(False)
-  # df['drill_unique_id'] = df['drill_unique_id'].fillna('')
-  # df['cme_unique_id'] = df['cme_unique_id'].fillna(0)
-  # df['id_number_cme'] = df['id_number_cme'].fillna('')
-  # df['id_number_drill'] = df['id_number_drill'].fillna('')
-  # df['facility_code'] = df['facility_code'].split('-')[0]
-  # df['facility_name'] = df['facility_name'].fillna('').split('-')[:]
 
   # Insert data into the database
   try:
@@ -76,20 +67,75 @@ def load_data():
       
       submission_id = None
       if row['_id'] != "None":
-         submission_id = str(row['_id'])
+         submission_id = int(row['_id'])
       else:
          submission_id = None
+      
+      essential_cme_topic = None
+      if row['mentor_checklist/cme_grp/cme_topics'] == ("Postpartum_haemorrhage_(PPH)" or "Infection_prevention"):
+         essential_cme_topic = True
+      else:
+         essential_cme_topic = False
+
+      essential_drill_topic = None
+      if row['mentor_checklist/drills_grp/drill_topics'] == "Eclampsia":
+         essential_drill_topic = True
+      else:
+         essential_drill_topic = False
+
+      drill_unique_id = None
+      if row['mentor_checklist/drills_grp/drill_topics'] == "Eclampsia":
+         drill_unique_id = 240331573077017
+      else:
+         drill_unique_id = None
+      
+      cme_unique_id = None
+      if row['mentor_checklist/cme_grp/cme_topics'] == "Postpartum_haemorrhage_(PPH)":
+         cme_unique_id = 372381678562412
+      else:
+         cme_unique_id = None
+
+      id_number_cme = None
+      if row['mentor_checklist/cme_grp/standard_phone_numbers_cme/id_number_1_001'] != 'None':
+         id_number_cme = str(row['mentor_checklist/cme_grp/standard_phone_numbers_cme/id_number_1_001'])
+      else:
+         id_number_cme = None
+      
+      id_number_drill = None
+      if row['mentor_checklist/drills_grp/id_numbers_drill/id_drill_1'] != "None":
+         id_number_drill = str(row['mentor_checklist/drills_grp/id_numbers_drill/id_drill_1'])
+      else:
+         id_number_drill = None
+      
+      facility_code = None
+      facility_name = None
+      facility = str(row['mentor_checklist/mentor/q_facility_bungoma'])
+      if facility != "None":
+         facility_code = facility.split('_')[0]
+         facility_name_str = facility.split('_')[1:]
+         facility_name = ' '.join(facility_name_str)
+      else:
+         facility_code = None
+         facility_name = None
 
       entry = MentorChecklist(
-        id=index,
+        id = index,
         cme_completion_date = cme_completion_date,
         date_submitted = date_submitted,
-        success_story=row['mentor_checklist/success_grp/story_success'],
-        mentor_name=row['mentor_checklist/mentor/name'],
-        county=row['mentor_checklist/mentor/q_county'],
-        cme_topic=row['mentor_checklist/cme_grp/cme_topics'],
-        drill_topic=row['mentor_checklist/drills_grp/drill_topics'],
-        submission_id=submission_id
+        essential_cme_topic = essential_cme_topic,
+        essential_drill_topic = essential_drill_topic,
+        success_story = row['mentor_checklist/success_grp/story_success'],
+        mentor_name = row['mentor_checklist/mentor/name'],
+        county = row['mentor_checklist/mentor/q_county'],
+        cme_topic = row['mentor_checklist/cme_grp/cme_topics'],
+        drill_topic = row['mentor_checklist/drills_grp/drill_topics'],
+        drill_unique_id = drill_unique_id,
+        cme_unique_id = cme_unique_id,
+        id_number_cme = id_number_cme,
+        id_number_drill = id_number_drill,
+        facility_name = facility_name,
+        facility_code = facility_code,
+        submission_id = submission_id
       )
       db.session.add(entry)
     db.session.commit()
